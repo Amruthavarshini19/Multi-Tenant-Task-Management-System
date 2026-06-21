@@ -7,6 +7,20 @@ import bcrypt from "bcryptjs";
 const userRouter = Router();
 userRouter.use(authenticate);
 
+// Get current user profile
+userRouter.get("/me", async (req, res, next) => {
+    try {
+        const { rows } = await db.query(
+            "SELECT id, email, role, org_id, created_at FROM users WHERE id = $1",
+            [req.user.userId]
+        );
+        if (!rows[0]) return res.status(404).json({ error: "User not found" });
+        res.json(rows[0]);
+    } catch (e) {
+        next(e);
+    }
+});
+
 // List users in org
 userRouter.get("/", async (req, res) => {
     const { rows } = await db.query("SELECT id, email, role, created_at FROM users WHERE org_id = $1", [req.user.orgId]);
