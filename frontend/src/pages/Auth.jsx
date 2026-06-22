@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Mail, Lock, Building2, Loader2, ArrowRight } from 'lucide-react';
+import { LayoutDashboard, Mail, Lock, Building2, Loader2, ArrowRight, KeyRound, CheckCircle2 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState('login'); // 'login' | 'register' | 'forgot'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [forgotSuccess, setForgotSuccess] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -17,11 +19,22 @@ const Auth = () => {
   const { login, register } = useAuth();
   const navigate = useNavigate();
 
+  const isLogin = mode === 'login';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     try {
+      if (mode === 'forgot') {
+        await fetch('http://localhost:8080/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: forgotEmail }),
+        });
+        setForgotSuccess(true);
+        return;
+      }
       if (isLogin) {
         await login(formData.email, formData.password);
       } else {
@@ -29,7 +42,7 @@ const Auth = () => {
       }
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Authentication failed');
+      setError(err.response?.data?.error || err.message || 'Authentication failed');
     } finally {
       setLoading(false);
     }
@@ -84,16 +97,73 @@ const Auth = () => {
         </div>
 
         <div className="w-full max-w-[400px] space-y-8">
-          <div className="text-center lg:text-left">
-            <h2 className="text-3xl font-bold tracking-tight">
-              {isLogin ? 'Welcome back' : 'Create an organization'}
-            </h2>
-            <p className="text-muted-foreground mt-2">
-              {isLogin 
-                ? 'Enter your credentials to access your workspace' 
-                : 'Start your 14-day free trial. No credit card required.'}
-            </p>
-          </div>
+
+          {/* ── Forgot Password Success Screen ───────────────────────── */}
+          {mode === 'forgot' && forgotSuccess ? (
+            <div className="text-center space-y-6">
+              <div className="w-16 h-16 rounded-2xl bg-green-500/10 flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-8 h-8 text-green-500" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold">Check your inbox</h2>
+                <p className="text-muted-foreground mt-2 text-sm">
+                  We've sent a reset link to <span className="font-semibold text-foreground">{forgotEmail}</span>. It expires in 1 hour.
+                </p>
+              </div>
+              <button
+                onClick={() => { setMode('login'); setForgotSuccess(false); setForgotEmail(''); }}
+                className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity"
+              >
+                Back to Sign In
+              </button>
+            </div>
+          ) : mode === 'forgot' ? (
+          /* ── Forgot Password Form ─────────────────────────────────── */
+            <>
+              <div className="text-center lg:text-left">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+                  <KeyRound className="w-6 h-6 text-primary" />
+                </div>
+                <h2 className="text-3xl font-bold tracking-tight">Forgot password?</h2>
+                <p className="text-muted-foreground mt-2">Enter your email and we'll send you a reset link.</p>
+              </div>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-sm font-medium">Email Address</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                    <input
+                      type="email" required
+                      className="pl-10 h-12 rounded-xl bg-secondary/30"
+                      placeholder="name@company.com"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                    />
+                  </div>
+                </div>
+                {error && <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm font-medium">{error}</div>}
+                <button disabled={loading} className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><ArrowRight className="w-4 h-4" />Send Reset Link</>}
+                </button>
+              </form>
+              <p className="text-center text-sm text-muted-foreground">
+                Remember it?
+                <button onClick={() => { setMode('login'); setError(''); }} className="ml-1 text-primary font-semibold hover:underline">Back to Sign In</button>
+              </p>
+            </>
+          ) : (
+          /* ── Login / Register Form ────────────────────────────────── */
+            <>
+            <div className="text-center lg:text-left">
+              <h2 className="text-3xl font-bold tracking-tight">
+                {isLogin ? 'Welcome back' : 'Create an organization'}
+              </h2>
+              <p className="text-muted-foreground mt-2">
+                {isLogin 
+                  ? 'Enter your credentials to access your workspace' 
+                  : 'Start your 14-day free trial. No credit card required.'}
+              </p>
+            </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
@@ -128,20 +198,31 @@ const Auth = () => {
               </div>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="password"
-                  required
-                  className="pl-10 h-12 rounded-xl bg-secondary/30"
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                />
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">Password</label>
+                  {isLogin && (
+                    <button
+                      type="button"
+                      onClick={() => { setMode('forgot'); setError(''); setForgotEmail(formData.email); }}
+                      className="text-xs text-primary font-semibold hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="password"
+                    required
+                    className="pl-10 h-12 rounded-xl bg-secondary/30"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  />
+                </div>
               </div>
-            </div>
 
             {error && (
               <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm font-medium">
@@ -193,14 +274,16 @@ const Auth = () => {
           </div>
 
           <p className="text-center text-sm text-muted-foreground">
-            {isLogin ? "Don't have an account?" : "Already have an account?"}
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="ml-1 text-primary font-semibold hover:underline"
-            >
-              {isLogin ? 'Sign up' : 'Sign in'}
-            </button>
-          </p>
+              {isLogin ? "Don't have an account?" : "Already have an account?"}
+              <button
+                onClick={() => { setMode(isLogin ? 'register' : 'login'); setError(''); }}
+                className="ml-1 text-primary font-semibold hover:underline"
+              >
+                {isLogin ? 'Sign up' : 'Sign in'}
+              </button>
+            </p>
+          </>
+          )}
         </div>
       </div>
     </div>

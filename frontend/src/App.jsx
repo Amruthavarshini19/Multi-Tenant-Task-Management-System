@@ -9,6 +9,7 @@ import AuditLogs from './pages/AuditLogs';
 import AuthCallback from './pages/AuthCallback';
 import MyTasks from './pages/MyTasks';
 import Settings from './pages/Settings';
+import ResetPassword from './pages/ResetPassword';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -22,6 +23,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/auth" element={<Auth />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route 
         path="/dashboard" 
         element={

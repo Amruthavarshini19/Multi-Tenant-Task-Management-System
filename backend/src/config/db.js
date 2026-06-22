@@ -21,6 +21,11 @@ export async function connectDB() {
     await client.query(createUsersTable);
     await client.query(createTasksTable);
     await client.query(createAuditTable);
+
+    // Migrations: add forgot-password columns if they don't exist yet
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token TEXT`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TIMESTAMPTZ`);
+
     await client.query("COMMIT");
     console.log("Database tables initialized successfully");
     
