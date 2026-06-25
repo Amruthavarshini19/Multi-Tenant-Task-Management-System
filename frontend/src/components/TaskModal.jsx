@@ -15,7 +15,7 @@ const TaskModal = ({ isOpen, onClose, onTaskCreated }) => {
 
   useEffect(() => {
     if (isOpen) {
-      axios.get('http://localhost:4000/api/users').then(({data}) => setMembers(data || []));
+      axios.get('/api/users').then(({data}) => setMembers(data || []));
     }
   }, [isOpen]);
 
@@ -25,7 +25,7 @@ const TaskModal = ({ isOpen, onClose, onTaskCreated }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('http://localhost:4000/api/tasks', formData);
+      await axios.post('/api/tasks', formData);
       onTaskCreated();
       onClose();
       setFormData({ title: '', description: '', status: 'todo', dueDate: new Date().toISOString().split('T')[0], assignedTo: '' });

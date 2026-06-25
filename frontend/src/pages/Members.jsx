@@ -13,7 +13,7 @@ const Members = () => {
 
   const fetchMembers = async () => {
     try {
-      const { data } = await axios.get('http://localhost:4000/api/users');
+      const { data } = await axios.get('/api/users');
       setMembers(data || []);
     } catch (err) {
       console.error(err);
@@ -130,7 +130,7 @@ const InviteModal = ({ isOpen, onClose, onInviteSuccess }) => {
         setLoading(false);
         return;
       }
-      await axios.post('http://localhost:4000/api/users/invite', formData);
+      await axios.post('/api/users/invite', formData);
       setSuccessData({ email: formData.email, password: formData.password });
       onInviteSuccess();
     } catch (err) {

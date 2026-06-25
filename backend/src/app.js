@@ -21,8 +21,13 @@ app.use(cookieParser());
 app.use(passport.initialize());
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow all localhost origins (any port) and requests with no origin (like curl)
-    if (!origin || origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) {
+    const allowed = [
+      'http://localhost',
+      'http://127.0.0.1',
+      process.env.ALLOWED_ORIGIN,
+    ].filter(Boolean);
+    // Allow requests with no origin (curl, server-to-server) or matching allowed list
+    if (!origin || allowed.some(o => origin.startsWith(o))) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));

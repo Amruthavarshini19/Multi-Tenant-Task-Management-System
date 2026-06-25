@@ -17,7 +17,7 @@ const Settings = () => {
     e.preventDefault();
     setPasswordConfig({ loading: true, success: false, error: '' });
     try {
-      await axios.put('http://localhost:4000/api/users/password', passwordData);
+      await axios.put('/api/users/password', passwordData);
       setPasswordConfig({ loading: false, success: true, error: '' });
       setPasswordData({ currentPassword: '', newPassword: '' });
       setTimeout(() => setPasswordConfig(prev => ({ ...prev, success: false })), 3000);

@@ -20,7 +20,7 @@ const AuditLogs = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const { data } = await axios.get('http://localhost:4000/api/audit');
+        const { data } = await axios.get('/api/audit');
         setLogs(data || []);
       } catch (err) {
         console.error(err);

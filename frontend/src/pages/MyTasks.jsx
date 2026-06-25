@@ -15,7 +15,7 @@ const MyTasks = () => {
 
   const fetchData = async () => {
     try {
-      const { data } = await axios.get('http://localhost:4000/api/tasks');
+      const { data } = await axios.get('/api/tasks');
       setTasks(data || []);
     } catch (err) {
       console.error(err);
@@ -30,7 +30,7 @@ const MyTasks = () => {
 
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
-      await axios.put(`http://localhost:4000/api/tasks/${taskId}`, { status: newStatus });
+      await axios.put(`/api/tasks/${taskId}`, { status: newStatus });
       fetchData();
     } catch (err) {
       console.error(err);

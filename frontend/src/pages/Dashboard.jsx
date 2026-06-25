@@ -29,8 +29,8 @@ const Dashboard = () => {
   const fetchData = async () => {
     try {
       const [tasksRes, auditRes] = await Promise.all([
-        axios.get('http://localhost:4000/api/tasks'),
-        user?.role === 'admin' ? axios.get('http://localhost:4000/api/audit') : Promise.resolve({ data: [] })
+        axios.get('/api/tasks'),
+        user?.role === 'admin' ? axios.get('/api/audit') : Promise.resolve({ data: [] })
       ]);
       
       const tasksData = tasksRes.data || [];
@@ -70,7 +70,7 @@ const Dashboard = () => {
 
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
-      await axios.put(`http://localhost:4000/api/tasks/${taskId}`, { status: newStatus });
+      await axios.put(`/api/tasks/${taskId}`, { status: newStatus });
       fetchData();
     } catch (err) {
       console.error(err);
