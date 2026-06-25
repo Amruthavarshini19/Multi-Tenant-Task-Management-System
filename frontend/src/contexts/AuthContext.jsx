@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const { data } = await axios.post('http://localhost:8080/api/auth/login', { email, password });
+    const { data } = await axios.post('/api/auth/login', { email, password });
     localStorage.setItem('accessToken', data.accessToken);
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
     setUser(data.user);
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (userData) => {
-    const { data } = await axios.post('http://localhost:8080/api/auth/register', userData);
+    const { data } = await axios.post('/api/auth/register', userData);
     localStorage.setItem('accessToken', data.accessToken);
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
     setUser(data.user);

@@ -27,7 +27,7 @@ const Auth = () => {
     setError('');
     try {
       if (mode === 'forgot') {
-        await fetch('http://localhost:8080/api/auth/forgot-password', {
+        await fetch('/api/auth/forgot-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: forgotEmail }),
@@ -50,7 +50,7 @@ const Auth = () => {
 
   const handleGoogleLogin = () => {
     // Redirect to backend OAuth route
-    window.location.href = 'http://localhost:8080/api/auth/google';
+    window.location.href = '/api/auth/google';
   };
 
   return (

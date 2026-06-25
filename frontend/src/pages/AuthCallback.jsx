@@ -27,7 +27,7 @@ const AuthCallback = () => {
         // The JWT payload has {userId, orgId, orgName, role}
         // but the rest of the app expects {id, email, orgId, orgName, role}
         // Fetch the full user profile to get the email field too
-        axios.get('http://localhost:8080/api/users/me')
+        axios.get('/api/users/me')
           .then(({ data }) => {
             // Normalize into the same shape as email/password login
             const normalizedUser = {
